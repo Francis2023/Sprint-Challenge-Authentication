@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const bcryptjs = require("bcryptjs");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const secrets = require("./secrets.js");
 
@@ -13,7 +13,7 @@ router.post('/register', (req, res) => {
    if (isValid(credentials)) {
      const rounds = process.env.BCRYPT_ROUNDS || 10;
 
-     const hash = bcryptjs.hashSync(credentials.password, rounds);
+     const hash = bcrypt.hashSync(credentials.password, rounds);
 
      credentials.password = hash;
 
@@ -33,20 +33,21 @@ router.post('/register', (req, res) => {
 
 router.post('/login', (req, res) => {
   // implement login
-  const {username, password} = req.body;
+  let {username, password} = req.body;
 
   if (isValid(req.body)) {
-    Users.findBy({ username: username })
-     .then(([user]) => {
-       if(user && bcryptjs.compareSync(password, user.password)) {
+    Users.findBy({ username })
+     .first()
+     .then(user => {
+       if(user && bcrypt.compareSync(password, user.password)) {
          const token = generateToken(user);
-         res.status(200).json({ message: "welcome ${user.username}",token})
+         res.status(200).json({ message: `welcome ${user.username}`,token})
        } else {
          res.status(401).json({ message: " Invalid credentials"});
        }
     })
     .catch(error => {
-      res.status(500).json({ message: error.message });
+      res.status(500).json({ message: 'login failed' });
     });
   } else {
      res.status(400).json({
@@ -57,8 +58,8 @@ router.post('/login', (req, res) => {
 
 function generateToken(user){
   const payload = {
-    subject = user.id,
-    username = user.name,
+    subject: user.id,
+    username: user.username,
 
   };
   const option ={

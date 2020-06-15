@@ -1,4 +1,4 @@
-const db = require("../database/connection.js");
+const db = require("../database/dbConfig.js");
 
 module.exports = {
    add,
@@ -25,10 +25,10 @@ function find() {
       .orderBy("id");
 }
 
-function findBy(filter) {
+function findBy(username) {
     return db("users")
-      .where(filter)
-      .orderBy("id");
+      .where(username)
+     // .orderBy("id");
 }
 
 function findById(id) {
