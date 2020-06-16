@@ -47,6 +47,7 @@ router.post('/login', (req, res) => {
        }
     })
     .catch(error => {
+      console.log(error)
       res.status(500).json({ message: 'login failed' });
     });
   } else {
@@ -62,8 +63,8 @@ function generateToken(user){
     username: user.username,
 
   };
-  const option ={
-    expiresIn: "2h"
+  const options ={
+    expiresIn: '2h'
   };
 
   return jwt.sign(payload, secrets.jwtSecret, options);

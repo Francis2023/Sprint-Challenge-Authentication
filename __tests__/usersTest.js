@@ -1,5 +1,7 @@
 const db = require('../database/dbConfig.js');
 const Users = require('../auth/auth-model.js');
+const request = require('supertest');
+const userRout = require('../auth/auth-router.js');
 
 describe('users model', () => {
     describe('add()', () => {
@@ -18,5 +20,20 @@ describe('users model', () => {
        beforeEach(async () => {
            await db('users').truncate();
        })
+    });
+});
+
+describe('POST /login', () => {
+    it('responds with json', () => {
+        request(userRout)
+          .post('/login')
+          .send({name: 'Don_D'})
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end( (err,res) => {
+             if (err) return done(err);
+             done();
+          });
     });
 });
